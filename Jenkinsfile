@@ -21,7 +21,7 @@ pipeline {
                         echo "Building..."
                         unstash "stash-${params.pname}"
                         bat "tree /f"
-                        bat "mvn clean package"
+                        bat "mvn clean package -DskipTests=true"
                     }
                 }
             }
@@ -32,8 +32,29 @@ pipeline {
                     dir("run-${params.pname}-${BUILD_NUMBER}") {
                         echo "Testing..."
                         unstash "stash-${params.pname}"
-                        bat "tree /f"
                         bat "mvn test"
+                    }
+                }
+            }
+        }
+        stage('Dependency Check') {
+            steps {
+                script {
+                    dir("run-${params.pname}-${BUILD_NUMBER}") {
+                        echo "Dependency Check..."
+                        unstash "stash-${params.pname}"
+                        bat "mvn org.owasp:dependency-check-maven:check"
+                    }
+                }
+            }
+        }
+        stage('Building Docker Image') {
+            steps {
+                script {
+                    dir("run-${params.pname}-${BUILD_NUMBER}") {
+                        echo "Deploying..."
+                        unstash "stash-${params.pname}"
+                        bat "docker build -t ${params.pname}:${BUILD_NUMBER} ."
                     }
                 }
             }
