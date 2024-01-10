@@ -1,21 +1,25 @@
 pipeline {
     agent any
-    parameters {
-        string(name: 'SERVICE_NAME', description: 'Name of the microservice')
+    tools{
+        maven 'maven3'
+        jdk 'jdk17'
     }
     stages {
-        stage('Checkout') {
+        stage('Cloning Git') {
             steps {
                 script {
-                    checkout scm
+                    echo "Cloning Git..."
+                    git branch: "${params.branch}", credentialsId: 'github', url: "${params.url}"
+                    stash includes: '**', name: "stash-${params.pname}"
                 }
             }
         }
-
-        stage('Build') {
+        stage('Building') {
             steps {
                 script {
-                    echo "Building ${params.SERVICE_NAME}..."
+                    echo "Building..."
+                    unstash "stash-${params.pname}"
+                    sh "mvn clean install"
                 }
             }
         }
