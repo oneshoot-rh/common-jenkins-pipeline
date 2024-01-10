@@ -17,11 +17,36 @@ pipeline {
         stage('Building') {
             steps {
                 script {
-                    echo "Building..."
-                    unstash "stash-${params.pname}"
-                    bat "tree /f"
-                    bat "mvn clean install"
+                    dir("run-${BUILD_NUMBER}") {
+                        echo "Building..."
+                        bat "tree /f"
+                        unstash "stash-${params.pname}"
+                        sh "mvn clean package"
+                    }
                 }
+            }
+        }
+        stage('Testing') {
+            steps {
+                script {
+                    dir("run-${BUILD_NUMBER}") {
+                        echo "Testing..."
+                        bat "tree /f"
+                        unstash "stash-${params.pname}"
+                        sh "mvn test"
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            script {
+                dir("run-${BUILD_NUMBER}") {
+                    echo "Cleaning up..."
+                    deleteDir() 
+                }   
+               
             }
         }
     }
