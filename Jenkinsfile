@@ -17,11 +17,11 @@ pipeline {
         stage('Building') {
             steps {
                 script {
-                    dir("run-${BUILD_NUMBER}") {
+                    dir("run-${params.pname}-${BUILD_NUMBER}") {
                         echo "Building..."
-                        bat "tree /f"
                         unstash "stash-${params.pname}"
-                        sh "mvn clean package"
+                        bat "tree /f"
+                        bat "mvn clean package"
                     }
                 }
             }
@@ -29,11 +29,11 @@ pipeline {
         stage('Testing') {
             steps {
                 script {
-                    dir("run-${BUILD_NUMBER}") {
+                    dir("run-${params.pname}-${BUILD_NUMBER}") {
                         echo "Testing..."
-                        bat "tree /f"
                         unstash "stash-${params.pname}"
-                        sh "mvn test"
+                        bat "tree /f"
+                        bat "mvn test"
                     }
                 }
             }
@@ -42,7 +42,7 @@ pipeline {
     post {
         always {
             script {
-                dir("run-${BUILD_NUMBER}") {
+                dir("run-${params.pname}-${BUILD_NUMBER}") {
                     echo "Cleaning up..."
                     deleteDir() 
                 }   
