@@ -19,7 +19,8 @@ pipeline {
                 script {
                     echo "Building..."
                     unstash "stash-${params.pname}"
-                    sh "mvn clean install"
+                    bat "tree /f"
+                    bat "mvn clean install"
                 }
             }
         }
