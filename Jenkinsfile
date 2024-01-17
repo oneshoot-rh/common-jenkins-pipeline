@@ -4,23 +4,34 @@ pipeline {
         maven 'maven3'
         jdk 'jdk17'
     }
+    environment {
+        DIR_NAME = "run-${params.pname}-${params.BUILD_NUMBER}"
+        DEPLOYENV = 'NONE'
+        BRANCH = "${params.branch}"
+    }
     stages {
         stage('Cloning Git') {
             steps {
                 script {
                     echo "Cloning Git..."
-                    git branch: "${params.branch}", credentialsId: 'github', url: "${params.url}"
+                    git branch: "${BRANCH}", credentialsId: 'github', url: "${params.url}"
                     stash includes: '**', name: "stash-${params.pname}"
                 }
             }
         }
+        stage('Checkout ENV'){
+            steps{
+                script{
+                    bat 'set'
+                }
+            }  
+        }
         stage('Building') {
             steps {
                 script {
-                    dir("run-${params.pname}-${BUILD_NUMBER}") {
+                    dir("${DIR_NAME}") {
                         echo "Building..."
                         unstash "stash-${params.pname}"
-                        bat "tree /f"
                         bat "mvn clean package -DskipTests=true"
                     }
                 }
@@ -29,7 +40,7 @@ pipeline {
         stage('Testing') {
             steps {
                 script {
-                    dir("run-${params.pname}-${BUILD_NUMBER}") {
+                    dir("${DIR_NAME}") {
                         echo "Testing..."
                         unstash "stash-${params.pname}"
                         bat "mvn test"
@@ -40,7 +51,7 @@ pipeline {
         stage('Dependency Check') {
             steps {
                 script {
-                    dir("run-${params.pname}-${BUILD_NUMBER}") {
+                    dir("${DIR_NAME}") {
                         echo "Dependency Check..."
                         unstash "stash-${params.pname}"
                         bat "mvn org.owasp:dependency-check-maven:check"
@@ -49,9 +60,14 @@ pipeline {
             }
         }
         stage('Building Docker Image') {
+            when{
+                expression{
+                    return BRANCH =~ /(release|bugfix)-*([a-z0-9]*)/ || BRANCHNAME == 'develop'
+                }
+            }
             steps {
                 script {
-                    dir("run-${params.pname}-${BUILD_NUMBER}") {
+                    dir("${DIR_NAME}") {
                         echo "Deploying..."
                         unstash "stash-${params.pname}"
                         bat "docker build -t ${params.pname}:${BUILD_NUMBER} ."
@@ -63,11 +79,7 @@ pipeline {
     post {
         always {
             script {
-                dir("run-${params.pname}-${BUILD_NUMBER}") {
-                    echo "Cleaning up..."
-                    deleteDir() 
-                }   
-               
+               cleanWs()
             }
         }
     }
