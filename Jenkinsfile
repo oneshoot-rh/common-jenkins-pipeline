@@ -63,7 +63,7 @@ pipeline {
         stage('Building Docker Image') {
             when{
                 expression{
-                    return BRANCH =~ /(release|bugfix)-*([a-z0-9]*)/ || BRANCHNAME == 'develop'
+                    return BRANCH =~ /(release|bugfix)-*([a-z0-9]*)/ || BRANCH == 'develop'
                 }
             }
             steps {
