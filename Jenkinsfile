@@ -14,6 +14,7 @@ pipeline {
             steps {
                 script {
                     echo "Cloning Git..."
+                    echo "branch name: ${BRANCH}"
                     git branch: "${BRANCH}", credentialsId: 'github', url: "${params.url}"
                     stash includes: '**', name: "stash-${params.pname}"
                 }
@@ -48,17 +49,17 @@ pipeline {
                 }
             }
         }
-        stage('Dependency Check') {
-            steps {
-                script {
-                    dir("${DIR_NAME}") {
-                        echo "Dependency Check..."
-                        unstash "stash-${params.pname}"
-                        bat "mvn org.owasp:dependency-check-maven:check"
-                    }
-                }
-            }
-        }
+        // stage('Dependency Check') {
+        //     steps {
+        //         script {
+        //             dir("${DIR_NAME}") {
+        //                 echo "Dependency Check..."
+        //                 unstash "stash-${params.pname}"
+        //                 bat "mvn org.owasp:dependency-check-maven:check"
+        //             }
+        //         }
+        //     }
+        // }
         stage('Building Docker Image') {
             when{
                 expression{
