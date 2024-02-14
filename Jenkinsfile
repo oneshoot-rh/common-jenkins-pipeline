@@ -112,12 +112,14 @@ pipeline {
                     script{
                         def releaseType = determineReleaseType()
                         echo "Release Type: ${releaseType}"
-                         def jsonBody = [
+                        def jsonBody = [
                             "serviceName": "${PROJECT_NAME}",
                             "deploymentEnv": "${DEPLOYENV}",
                             "versionPart": "${releaseType}"
-                        ]
+                        ].toString()
+
                         bat "curl -X POST -H 'Content-Type: application/json' -d '${jsonBody}' ${VERSION_TRACKER_SERVER}"
+
                         def app = docker.build("${REGISTRY_REPO_NAME}/${PROJECT_NAME}:${TAG}")
                         docker.withRegistry("", REGISTRY_CREDENTIALS) {
                             app.push()
