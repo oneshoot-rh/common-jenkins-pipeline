@@ -9,7 +9,7 @@ pipeline {
         DIR_NAME = "run-${PROJECT_NAME}-${params.BUILD_NUMBER}"
         DEPLOYENV = 'NONE'
         BRANCH = "${params.branch}"
-        VERSION_TRACKER_SERVER = 'http://localhost:1212'
+        VERSION_TRACKER_SERVER = 'http://localhost:1212/api/v1/versioning'
         TAG    = ""
         MAJOR_VERSION = 1
         MINOR_VERSION = 0
