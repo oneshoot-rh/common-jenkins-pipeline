@@ -120,7 +120,7 @@ pipeline {
                             "versionPart": "${releaseType}"
                         ].toString()
                         bat """curl -X POST -H \"Content-Type: application/json\" -d \"{\\\"serviceName\\\":\\\"${PROJECT_NAME}\\\",\\\"deploymentEnv\\\":\\\"${DEPLOYENV}\\\",\\\"versionPart\\\":\\\"${releaseType}\\\"}\" http://localhost:1212/api/v1/versioning"""
-                        def app = docker.build("${REGISTRY_REPO_NAME}/${PROJECT_NAME}:${TAG}")
+                        def app = docker.build("${PROJECT_NAME}:${TAG}")
                         docker.withRegistry("", REGISTRY_CREDENTIALS) {
                             app.push()
                         }
