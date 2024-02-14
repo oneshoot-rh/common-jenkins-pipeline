@@ -119,7 +119,7 @@ pipeline {
                             "deploymentEnv": "${DEPLOYENV}",
                             "versionPart": "${releaseType}"
                         ].toString()
-                        bat """curl -X POST -H "Content-Type: application/json" -d "{\"serviceName\":\"${PROJECT_NAME}\",\"deploymentEnv\":\"${DEPLOYENV}\",\"versionPart\":\"${releaseType}\"}" ${VERSION_TRACKER_SERVER}"""
+                        bat """curl -X POST -H \"Content-Type: application/json\" -d \"{\\\"serviceName\\\":\\\"${PROJECT_NAME}\\\",\\\"deploymentEnv\\\":\\\"${DEPLOYENV}\\\",\\\"versionPart\\\":\\\"${releaseType}\\\"}\" ${VERSION_TRACKER_SERVER}/api/v1/versioning"""
                         def app = docker.build("${REGISTRY_REPO_NAME}/${PROJECT_NAME}:${TAG}")
                         docker.withRegistry("", REGISTRY_CREDENTIALS) {
                             app.push()
