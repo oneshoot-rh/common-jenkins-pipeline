@@ -48,6 +48,7 @@ pipeline {
                     }
                     steps{
                         script{
+                            DEPLOYENV = 'DEV'
                             TAG = bat(script: "curl -X GET ${VERSION_TRACKER_SERVER}/${PROJECT_NAME}/${DEPLOYENV}", returnStdout: true).trim()
                         }
                     }
@@ -63,7 +64,8 @@ pipeline {
                     }
                     steps{
                         script{
-                           TAG = bat(script: "curl -X GET ${VERSION_TRACKER_SERVER}/${PROJECT_NAME}/${DEPLOYENV}", returnStdout: true).trim()
+                            DEPLOYENV = 'PROD'
+                            TAG = bat(script: "curl -X GET ${VERSION_TRACKER_SERVER}/${PROJECT_NAME}/${DEPLOYENV}", returnStdout: true).trim()
                         }
                     }
                 }
