@@ -49,7 +49,7 @@ pipeline {
                     steps{
                         script{
                             DEPLOYENV = 'DEV'
-                            final String response = bat(script: "curl -X GET ${VERSION_TRACKER_SERVER}/${PROJECT_NAME}/${DEPLOYENV}", returnStdout: true).trim()
+                            final String response = bat(script: "curl -s ${VERSION_TRACKER_SERVER}/${PROJECT_NAME}/${DEPLOYENV}", returnStdout: true).trim()
                             TAG = response
                             echo "TAG: ${TAG}"
                         }
@@ -67,7 +67,7 @@ pipeline {
                     steps{
                         script{
                             DEPLOYENV = 'PROD'
-                            final String response = bat(script: "curl -X GET ${VERSION_TRACKER_SERVER}/${PROJECT_NAME}/${DEPLOYENV}", returnStdout: true).trim()
+                            final String response = bat(script: "curl -s ${VERSION_TRACKER_SERVER}/${PROJECT_NAME}/${DEPLOYENV}", returnStdout: true).trim()
                             TAG = response
                             echo "TAG: ${TAG}"
                         }
