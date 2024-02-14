@@ -5,7 +5,8 @@ pipeline {
         jdk 'jdk17'
     }
     environment {
-        DIR_NAME = "run-${params.pname}-${params.BUILD_NUMBER}"
+        PROJECT_NAME = ${params.pname}
+        DIR_NAME = "run-${PROJECT_NAME}-${params.BUILD_NUMBER}"
         DEPLOYENV = 'NONE'
         BRANCH = "${params.branch}"
         VERSION_TRACKER_SERVER = 'http://localhost:1212'
@@ -23,7 +24,7 @@ pipeline {
                     echo "Cloning Git..."
                     echo "branch name: ${BRANCH}"
                     git branch: "${BRANCH}", credentialsId: 'github', url: "${params.url}"
-                    stash includes: '**', name: "stash-${params.pname}"
+                    stash includes: '**', name: "stash-${PROJECT_NAME}"
                 }
             }
         }
@@ -47,7 +48,7 @@ pipeline {
                     }
                     steps{
                         script{
-                            TAG = bat(script: "curl -X GET ${VERSION_TRACKER_SERVER}/${params.pname}/${DEPLOYENV}", returnStdout: true).trim()
+                            TAG = bat(script: "curl -X GET ${VERSION_TRACKER_SERVER}/${PROJECT_NAME}/${DEPLOYENV}", returnStdout: true).trim()
                         }
                     }
                 }
@@ -62,7 +63,7 @@ pipeline {
                     }
                     steps{
                         script{
-                           TAG = bat(script: "curl -X GET ${VERSION_TRACKER_SERVER}/${params.pname}/${DEPLOYENV}", returnStdout: true).trim()
+                           TAG = bat(script: "curl -X GET ${VERSION_TRACKER_SERVER}/${PROJECT_NAME}/${DEPLOYENV}", returnStdout: true).trim()
                         }
                     }
                 }
@@ -73,7 +74,7 @@ pipeline {
                 script {
                     dir("${DIR_NAME}") {
                         echo "Building..."
-                        unstash "stash-${params.pname}"
+                        unstash "stash-${PROJECT_NAME}"
                         bat "mvn clean package -DskipTests=true"
                     }
                 }
@@ -84,7 +85,7 @@ pipeline {
                 script {
                     dir("${DIR_NAME}") {
                         echo "Testing..."
-                        unstash "stash-${params.pname}"
+                        unstash "stash-${PROJECT_NAME}"
                         bat "mvn test"
                     }
                 }
@@ -95,7 +96,7 @@ pipeline {
         //         script {
         //             dir("${DIR_NAME}") {
         //                 echo "Dependency Check..."
-        //                 unstash "stash-${params.pname}"
+        //                 unstash "stash-${PROJECT_NAME}"
         //                 bat "mvn org.owasp:dependency-check-maven:check"
         //             }
         //         }
@@ -111,9 +112,9 @@ pipeline {
                     script{
                         def releaseType = determineReleaseType()
                         echo "Release Type: ${releaseType}"
-                        def jsonBody = "{"serviceName": "${params.pname}"},"deploymentEnv": "${DEPLOYENV}","versionPart": "${releaseType}"}"
+                        def jsonBody = "{"serviceName": "${PROJECT_NAME}"},"deploymentEnv": "${DEPLOYENV}","versionPart": "${releaseType}"}"
                         bat "curl -X POST -H 'Content-Type: application/json' -d '${jsonBody}' ${VERSION_TRACKER_SERVER}"
-                        def app = docker.build("${REGISTRY_REPO_NAME}/${params.pname}:${TAG}")
+                        def app = docker.build("${REGISTRY_REPO_NAME}/${PROJECT_NAME}:${TAG}")
                         docker.withRegistry("", REGISTRY_CREDENTIALS) {
                             app.push()
                         }
