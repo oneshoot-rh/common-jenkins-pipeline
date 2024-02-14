@@ -35,7 +35,7 @@ pipeline {
             }  
         }
         stage('Get Current Version'){
-            parralel{
+            parallel{
                 stage('DEV'){
                     when{
                         expression{
