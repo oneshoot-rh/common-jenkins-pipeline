@@ -124,7 +124,7 @@ pipeline {
                             "versionPart": "${releaseType}"
                         ].toString()
                         bat """curl -X POST -H \"Content-Type: application/json\" -d \"{\\\"serviceName\\\":\\\"${PROJECT_NAME}\\\",\\\"deploymentEnv\\\":\\\"${DEPLOYENV}\\\",\\\"versionPart\\\":\\\"${releaseType}\\\"}\" http://localhost:1212/api/v1/versioning"""
-                        def imageName = "${PROJECT_NAME}:${TAG}"
+                        def imageName = "${REGISTRY_REPO_NAME}/${PROJECT_NAME}:${TAG}"
                         echo "Building Docker Image : ${imageName}"
                         def app = docker.build("${imageName}")
                         docker.withRegistry("", REGISTRY_CREDENTIALS) {
