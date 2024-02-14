@@ -120,24 +120,26 @@ pipeline {
                             unstash "stash-${PROJECT_NAME}"
                             def releaseType = determineReleaseType()
                             echo "Release Type: ${releaseType}"
-                            def jsonBody = [
-                                "serviceName": "${PROJECT_NAME}",
-                                "deploymentEnv": "${DEPLOYENV}",
-                                "versionPart": "${releaseType}"
-                            ].toString()
-                            bat """curl -X POST -H \"Content-Type: application/json\" -d \"{\\\"serviceName\\\":\\\"${PROJECT_NAME}\\\",\\\"deploymentEnv\\\":\\\"${DEPLOYENV}\\\",\\\"versionPart\\\":\\\"${releaseType}\\\"}\" http://localhost:1212/api/v1/versioning"""
                             def imageName = "${REGISTRY_REPO_NAME}/${PROJECT_NAME}:${TAG}"
                             echo "Building Docker Image : ${imageName}"
                             def app = docker.build("${imageName}")
                             docker.withRegistry("", REGISTRY_CREDENTIALS) {
                                 app.push()
                             }
-                            bat """git tag -a v${TAG} -m "New Release" """
-                            bat "git push origin v${TAG}"
+                            // bat """git tag -a v${TAG} -m "New Release" """
+                            // bat "git push origin v${TAG}"
                         }   
                         
                     }
                 }  
+        }
+        stage("Update Version"){
+            steps{
+                script{
+                    bat """curl -X POST -H \"Content-Type: application/json\" -d \"{\\\"serviceName\\\":\\\"${PROJECT_NAME}\\\",\\\"deploymentEnv\\\":\\\"${DEPLOYENV}\\\",\\\"versionPart\\\":\\\"${releaseType}\\\"}\" http://localhost:1212/api/v1/versioning"""
+                            
+                }
+            }
         }
     }
     post {
