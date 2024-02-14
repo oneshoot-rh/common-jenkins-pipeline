@@ -136,8 +136,8 @@ pipeline {
         stage("Update Version"){
             steps{
                 script{
-                    bat """curl -X POST -H \"Content-Type: application/json\" -d \"{\\\"serviceName\\\":\\\"${PROJECT_NAME}\\\",\\\"deploymentEnv\\\":\\\"${DEPLOYENV}\\\",\\\"versionPart\\\":\\\"${releaseType}\\\"}\" http://localhost:1212/api/v1/versioning"""
-                            
+                    def releaseType = determineReleaseType()
+                    bat """curl -X POST -H \"Content-Type: application/json\" -d \"{\\\"serviceName\\\":\\\"${PROJECT_NAME}\\\",\\\"deploymentEnv\\\":\\\"${DEPLOYENV}\\\",\\\"versionPart\\\":\\\"${releaseType}\\\"}\" http://localhost:1212/api/v1/versioning"""        
                 }
             }
         }
