@@ -40,7 +40,7 @@ pipeline {
                 stage('DEV'){
                     when{
                         expression{
-                            return BRANCHNAME =~ /(feature)-*([a-z0-9]*)/
+                            return BRANCH =~ /(feature)-*([a-z0-9]*)/
                         }
                     }
                     environment{
@@ -134,11 +134,11 @@ pipeline {
 }
 
 def determineReleaseType() {
-        if (env.BRANCH_NAME.endsWith('major-release') || env.BRANCH_NAME == 'develop') {
+        if (BRANCH.endsWith('major-release') || BRANCH == 'develop') {
             return 'MAJOR'
-        } else if (env.BRANCH_NAME.endsWith('release')) {
+        } else if (BRANCH.endsWith('release')) {
             return 'MINOR'
-        } else if (env.BRANCH_NAME =~ /(bugfix)-*([a-z0-9]*)/ ) {
+        } else if (BRANCH =~ /(bugfix)-*([a-z0-9]*)/ ) {
             return 'PATCH'
         } else {
             return 'UNKNOWN'
