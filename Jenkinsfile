@@ -50,8 +50,8 @@ pipeline {
                         script{
                             DEPLOYENV = 'DEV'
                             final String response = bat(script: "curl -s ${VERSION_TRACKER_SERVER}/${PROJECT_NAME}/${DEPLOYENV}", returnStdout: true).trim()
-                            TAG = response
-                            echo "TAG: ${TAG}"
+                            TAG = response.tokenize('\n').last().trim()
+                            echo "---TAG: ${TAG}"
                         }
                     }
                 }
@@ -68,8 +68,8 @@ pipeline {
                         script{
                             DEPLOYENV = 'PROD'
                             final String response = bat(script: "curl -s ${VERSION_TRACKER_SERVER}/${PROJECT_NAME}/${DEPLOYENV}", returnStdout: true).trim()
-                            TAG = response
-                            echo "TAG: ${TAG}"
+                            TAG = response.tokenize('\n').last().trim()
+                            echo "---TAG: ${TAG}"
                         }
                     }
                 }
