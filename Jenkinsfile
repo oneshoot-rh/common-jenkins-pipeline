@@ -5,7 +5,7 @@ pipeline {
         jdk 'jdk17'
     }
     environment {
-        PROJECT_NAME = ${params.pname}
+        PROJECT_NAME = "${params.pname}"
         DIR_NAME = "run-${PROJECT_NAME}-${params.BUILD_NUMBER}"
         DEPLOYENV = 'NONE'
         BRANCH = "${params.branch}"
