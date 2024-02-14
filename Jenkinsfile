@@ -140,9 +140,9 @@ pipeline {
 }
 
 def determineReleaseType() {
-        if (BRANCH.endsWith('major-release') || BRANCH == 'develop') {
+        if (BRANCH.endsWith('major-release')) {
             return 'MAJOR'
-        } else if (BRANCH.endsWith('release')) {
+        } else if (BRANCH.endsWith('release') || BRANCH == 'develop') {
             return 'MINOR'
         } else if (BRANCH =~ /(bugfix)-*([a-z0-9]*)/ ) {
             return 'PATCH'
